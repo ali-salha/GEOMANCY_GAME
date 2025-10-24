@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Icons</title>
+</head>
+<body>
+    <canvas id="canvas" width="512" height="512" style="border:1px solid #000;"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Create icon background
+        ctx.fillStyle = '#2D1B69';
+        ctx.fillRect(0, 0, 512, 512);
+        
+        // Create geometric pattern (simple dots)
+        ctx.fillStyle = '#D4AF37';
+        ctx.font = 'bold 200px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('•', 256, 256);
+        
+        // Download function
+        function downloadIcon(size) {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = size;
+            tempCanvas.height = size;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            tempCtx.drawImage(canvas, 0, 0, 512, 512, 0, 0, size, size);
+            
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = tempCanvas.toDataURL();
+            link.click();
+        }
+        
+        // Create all required sizes
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        sizes.forEach(size => {
+            setTimeout(() => downloadIcon(size), 100);
+        });
+    </script>
+</body>
+</html>

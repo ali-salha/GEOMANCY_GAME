@@ -1,0 +1,767 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0F1020 0%, #2D1B69 100%);
+    color: #F5F5F5;
+    min-height: 100vh;
+    padding: 20px;
+    direction: rtl;
+    text-align: right;
+    overflow-x: hidden;
+}
+
+#app {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Button Styles */
+.btn-primary {
+    background: linear-gradient(135deg, #D4AF37 0%, #F5C542 100%);
+    color: #2D1B69;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1em;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    text-align: center;
+    width: auto;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+}
+
+/* Screen Management */
+.screen {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Container for centered content */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+}
+
+/* Progress Bar */
+.progress-container {
+    margin: 20px 0;
+}
+
+.progress-text {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #D4AF37;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #D4AF37, #F5C542);
+    width: 0%;
+    transition: width 0.5s ease;
+    transform-origin: right center;
+}
+
+/* Card Stack Container - ALWAYS VISIBLE CARDS */
+.card-stack-container {
+    margin: 40px 0;
+    padding: 40px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    overflow: visible !important;
+    width: 100%;
+    position: relative;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-stack {
+    display: flex;
+    justify-content: center;
+    height: 140px;
+    position: relative;
+    width: 100%;
+    min-height: 140px;
+    overflow: visible !important;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Card Base Styles - ALWAYS VISIBLE */
+.card {
+    width: 80px;
+    height: 120px;
+    position: absolute;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transform-origin: center center;
+    transform: translateY(0) scale(1);
+    z-index: auto;
+    opacity: 1 !important;
+    visibility: visible !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px;
+}
+
+/* Hover effect - works when not shuffling */
+.card:not(.shuffling):hover {
+    transform: translateY(-25px) scale(1.05) !important;
+    box-shadow: 
+        0 12px 30px rgba(0, 0, 0, 0.4),
+        0 0 0 2px rgba(212, 175, 55, 0.3) !important;
+    transition: all 0.2s ease !important;
+    z-index: 1000 !important;
+}
+
+/* Shuffling state - CARDS STAY VISIBLE */
+.card.shuffling {
+    pointer-events: none;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 200 !important;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+/* Reset transform after animations complete */
+.card:not(.shuffling) {
+    animation: none !important;
+    transform: translateY(0) scale(1) !important;
+    transition: all 0.3s ease !important;
+    z-index: auto;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    backface-visibility: hidden !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.6s ease;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Card Front - Shows geomancy figure */
+.card-front {
+    background: linear-gradient(135deg, #2D1B69 0%, #0F1020 100%);
+    color: #D4AF37;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 5px;
+    transform: rotateY(180deg);
+    opacity: 1 !important;
+}
+
+/* Card Back - Same design for all cards - PURE RED */
+.card-back {
+    background: #FF0000 !important;
+    border: 2px solid #CC0000 !important;
+    background-image: none !important;
+    transform: rotateY(0deg);
+    opacity: 1 !important;
+}
+
+.card.flipped .card-front {
+    transform: rotateY(0deg);
+    opacity: 1 !important;
+}
+
+.card.flipped .card-back {
+    transform: rotateY(180deg);
+    opacity: 1 !important;
+}
+
+/* Stacking Effect - RTL from right to left */
+.card:nth-child(1) { right: 0%; left: auto; z-index: 16; }
+.card:nth-child(2) { right: 5%; left: auto; z-index: 15; }
+.card:nth-child(3) { right: 10%; left: auto; z-index: 14; }
+.card:nth-child(4) { right: 15%; left: auto; z-index: 13; }
+.card:nth-child(5) { right: 20%; left: auto; z-index: 12; }
+.card:nth-child(6) { right: 25%; left: auto; z-index: 11; }
+.card:nth-child(7) { right: 30%; left: auto; z-index: 10; }
+.card:nth-child(8) { right: 35%; left: auto; z-index: 9; }
+.card:nth-child(9) { right: 40%; left: auto; z-index: 8; }
+.card:nth-child(10) { right: 45%; left: auto; z-index: 7; }
+.card:nth-child(11) { right: 50%; left: auto; z-index: 6; }
+.card:nth-child(12) { right: 55%; left: auto; z-index: 5; }
+.card:nth-child(13) { right: 60%; left: auto; z-index: 4; }
+.card:nth-child(14) { right: 65%; left: auto; z-index: 3; }
+.card:nth-child(15) { right: 70%; left: auto; z-index: 2; }
+.card:nth-child(16) { right: 75%; left: auto; z-index: 1; }
+
+/* Card Extraction Animation */
+.card.extracted {
+    transform: translateY(-60px) scale(1.2);
+    z-index: 100;
+    transition: all 0.5s ease;
+    opacity: 1 !important;
+}
+
+.card.flipped {
+    z-index: 100;
+    opacity: 1 !important;
+}
+
+/* Card returning to deck */
+.card.returning {
+    transform: translateY(0) scale(1);
+    transition: all 0.5s ease;
+    opacity: 1 !important;
+}
+
+/* Geomancy Figure Styles (on card front) */
+.geomancy-figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+}
+
+.figure-lines {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+}
+
+.figure-line {
+    font-size: 1.6em;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #D4AF37;
+    text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+    line-height: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    min-height: 0;
+}
+
+.figure-name {
+    font-size: 0.7em;
+    font-weight: normal;
+    text-align: center;
+    color: #F5F5F5;
+    line-height: 1.1;
+    margin-top: 4px;
+}
+
+/* Mothers Display Container - RTL Arabic */
+.mothers-display-container {
+    margin: 30px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    text-align: center;
+}
+
+.mothers-display-container h3 {
+    color: #D4AF37;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+}
+
+.mothers-row {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+    direction: rtl;
+}
+
+.mother-figure-display {
+    background: linear-gradient(135deg, #2D1B69 0%, #0F1020 100%);
+    padding: 20px 15px;
+    border-radius: 10px;
+    border: 2px solid #D4AF37;
+    width: 70px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    direction: ltr;
+}
+
+/* Pure vertical dots display */
+.mother-figure-display .figure-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    direction: ltr;
+}
+
+.mother-figure-display .figure-line {
+    font-size: 2em;
+    font-weight: bold;
+    letter-spacing: 10px;
+    color: #D4AF37;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
+    line-height: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 25px;
+    direction: ltr;
+}
+
+/* Shuffle Button Styles */
+#shuffle-btn {
+    margin: 20px;
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #6A0DAD 0%, #8A2BE2 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+#shuffle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(138, 43, 226, 0.3);
+}
+
+/* ===== FIXED GEOMANCY CHART STYLES - PROPER RTL ===== */
+.chart-container {
+    margin: 40px 0;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    text-align: center;
+    direction: rtl;
+}
+
+.chart-container h3 {
+    color: #D4AF37;
+    margin-bottom: 30px;
+    font-size: 1.5em;
+}
+
+.geomancy-tree {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    width: 100%;
+}
+
+/* Chart rows - PROPER RTL LAYOUT */
+.chart-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    direction: rtl;
+    width: 100%;
+    gap: 20px;
+}
+
+/* Specific row layouts for the tree structure */
+.row-1 {
+    justify-content: center;
+    gap: 15px;
+}
+
+.row-2 {
+    justify-content: center;
+    gap: 40px;
+}
+
+.row-3 {
+    justify-content: center;
+    gap: 100px;
+}
+
+.row-4, .row-5 {
+    justify-content: center;
+}
+
+/* Chart figures */
+.chart-figure {
+    background: linear-gradient(135deg, #2D1B69 0%, #0F1020 100%);
+    padding: 20px 15px;
+    border-radius: 12px;
+    border: 2px solid #D4AF37;
+    width: 90px;
+    height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.house-number {
+    position: absolute;
+    top: -12px;
+    background: #D4AF37;
+    color: #2D1B69;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.chart-figure .figure-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    direction: ltr; /* Dots remain LTR for proper display */
+}
+
+.chart-figure .figure-line {
+    font-size: 1.6em;
+    font-weight: bold;
+    letter-spacing: 6px;
+    color: #D4AF37;
+    text-shadow: 0 0 8px rgba(212, 175, 55, 0.8);
+    line-height: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 20px;
+}
+
+.chart-figure .figure-name {
+    font-size: 0.75em;
+    font-weight: normal;
+    text-align: center;
+    color: #F5F5F5;
+    margin-top: 8px;
+    line-height: 1.2;
+    direction: rtl; /* Arabic text RTL */
+}
+
+/* Connection lines for tree structure */
+.chart-row:not(.row-5) {
+    position: relative;
+}
+
+.chart-row:not(.row-5)::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(212, 175, 55, 0.3);
+}
+
+/* Performance optimizations */
+.card {
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        padding: 10px;
+    }
+    
+    .card-stack-container {
+        padding: 30px 15px;
+        min-height: 200px;
+        margin: 30px 0;
+    }
+    
+    .card {
+        width: 60px;
+        height: 90px;
+    }
+    
+    .mothers-row {
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .mother-figure-display {
+        width: 60px;
+        height: 140px;
+        padding: 15px 10px;
+    }
+    
+    .mother-figure-display .figure-line {
+        font-size: 1.6em;
+        letter-spacing: 8px;
+    }
+    
+    .progress-text {
+        font-size: 1.1em;
+    }
+    
+    .btn-primary {
+        padding: 12px 24px;
+        font-size: 1em;
+    }
+    
+    /* Chart responsive */
+    .chart-figure {
+        width: 70px;
+        height: 120px;
+        padding: 15px 10px;
+    }
+    
+    .chart-row {
+        gap: 10px;
+    }
+    
+    .row-1 { gap: 10px; }
+    .row-2 { gap: 20px; }
+    .row-3 { gap: 50px; }
+    
+    .chart-figure .figure-line {
+        font-size: 1.4em;
+        letter-spacing: 4px;
+    }
+    
+    .chart-figure .figure-name {
+        font-size: 0.7em;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-stack {
+        max-width: 100%;
+    }
+    
+    .card {
+        width: 50px;
+        height: 75px;
+    }
+    
+    .mother-figure-display {
+        width: 50px;
+        height: 120px;
+    }
+    
+    .mother-figure-display .figure-line {
+        font-size: 1.4em;
+        letter-spacing: 6px;
+    }
+    
+    .figure-lines {
+        font-size: 1.8em;
+    }
+    
+    .figure-name {
+        font-size: 0.7em;
+    }
+    
+    .card-stack-container {
+        min-height: 180px;
+        padding: 20px 10px;
+    }
+
+    /* Chart mobile */
+    .chart-figure {
+        width: 60px;
+        height: 110px;
+        padding: 12px 8px;
+    }
+    
+    .chart-figure .figure-line {
+        font-size: 1.2em;
+        letter-spacing: 3px;
+    }
+    
+    .chart-row {
+        gap: 8px;
+    }
+    
+    .row-1 { gap: 8px; }
+    .row-2 { gap: 15px; }
+    .row-3 { gap: 30px; }
+    
+    .geomancy-tree {
+        gap: 30px;
+    }
+    
+    .house-number {
+        width: 25px;
+        height: 25px;
+        font-size: 0.8em;
+    }
+}
+
+/* High-performance mode for smooth animations */
+@media (prefers-reduced-motion: no-preference) {
+    .card {
+        transition: 
+            transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+            box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .card {
+        transition: none;
+    }
+    
+    .card.shuffling {
+        animation: none;
+    }
+    
+    .card:not(.shuffling):hover {
+        transform: translateY(-10px) scale(1.02) !important;
+    }
+}
+
+/* Global no-clip rule for all card states */
+.card,
+.card *,
+.card-shuffling,
+.card-shuffling * {
+    opacity: 1 !important;
+    visibility: visible !important;
+    clip: auto !important;
+    clip-path: none !important;
+}
+/* Chart Buttons Layout */
+.chart-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.chart-buttons .btn-primary {
+    margin: 0;
+    padding: 12px 20px;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Save button specific styles */
+#save-chart-btn {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
+#save-chart-btn:hover {
+    box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
+}
+
+#save-chart-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Responsive buttons */
+@media (max-width: 480px) {
+    .chart-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .chart-buttons .btn-primary {
+        width: 200px;
+        justify-content: center;
+    }
+}
+* Mobile PWA Optimizations */
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+button, .card, .btn-primary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card-stack-container, .container {
+  touch-action: manipulation;
+}
+
+/* Prevent bounce/scrolling on iOS */
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#app {
+  height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
